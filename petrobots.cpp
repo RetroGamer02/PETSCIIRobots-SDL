@@ -15,6 +15,8 @@
 #endif
 #include "petrobots.h"
 
+#include <3ds.h>
+
 // MAP FILES CONSIST OF EVERYTHING FROM THIS POINT ON
 uint8_t MAP_DATA[8960];
 // END OF MAP FILE
@@ -112,6 +114,10 @@ uint8_t SCREEN_MEMORY[SCREEN_WIDTH_IN_CHARACTERS * SCREEN_HEIGHT_IN_CHARACTERS];
 int main(int argc, char *argv[])
 {
     PlatformClass platformInstance;
+
+    osSetSpeedupEnable(true);
+
+    romfsInit();
 
     if (!platform) {
         return 1;
@@ -389,15 +395,25 @@ uint8_t CLOCK_ACTIVE = 0;
 uint8_t INACTIVE_SECONDS = 0;
 #endif
 
+//Credit to erfg12 for fps limiter
+Uint32 next_time;
+Uint32 time_left(void)
+{
+    Uint32 now;
+
+    now = SDL_GetTicks();
+    if (next_time <= now)
+        return 0;
+    else
+        return next_time - now;
+}
+
 // This routine spaces out the timers so that not everything
 // is running out once. It also starts the game_clock.
 void SET_INITIAL_TIMERS()
 {
-    CLOCK_ACTIVE = 1;
-    for (int X = 1; X != 48; X++) {
-        UNIT_TIMER_A[X] = X;
-        UNIT_TIMER_B[X] = 0;
-    }
+    SDL_Delay(time_left()); // limit FPS on computers and mobile devices. Causes issues on game consoles and web.
+    next_time += TICK_INTERVAL;
 }
 
 void MAIN_GAME_LOOP()

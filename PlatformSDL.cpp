@@ -210,7 +210,7 @@ PlatformSDL::PlatformSDL() :
 
     SDL_AudioSpec requestedAudioSpec;
     SDL_zero(requestedAudioSpec);
-    requestedAudioSpec.freq = 44100;
+    requestedAudioSpec.freq = 22050;
     requestedAudioSpec.format = AUDIO_S16LSB;
     requestedAudioSpec.channels = 1;
     requestedAudioSpec.samples = 512;
@@ -254,7 +254,8 @@ PlatformSDL::PlatformSDL() :
     animTilesSurface = IMG_Load("animtiles.png");
 #ifdef PLATFORM_SPRITE_SUPPORT
     spritesSurface = IMG_Load("spritesalpha.png");
-    SDL_SetColorKey(spritesSurface, SDL_TRUE, 16);
+    //Credit to erfg12 for sprite alpha fix
+    SDL_SetColorKey(spritesSurface, SDL_TRUE, SDL_MapRGB(spritesSurface->format, 255, 0, 255));
 #endif
 #endif
 #ifdef PLATFORM_CURSOR_SUPPORT
@@ -584,7 +585,11 @@ uint32_t PlatformSDL::load(const char* filename, uint8_t* destination, uint32_t 
 {
     uint32_t bytesRead = 0;
 
-    FILE* file = fopen(filename, "r");
+    char path[260] = "romfs:/";
+
+    strcat(path, filename);
+
+    FILE* file = fopen(path, "r");
     if (file) {
         bytesRead = (uint32_t)fread(destination, 1, size, file);
 

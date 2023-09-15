@@ -3,9 +3,10 @@
 
 #define PlatformClass PlatformSDL
 
-#include <SDL.h>
-#include <SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include "Platform.h"
+#include <cstring>
 
 class PlatformSDL : public Platform {
 public:
